@@ -17,28 +17,30 @@
                             
                             parser = new DOMParser();
                             doc = parser.parseFromString(data, "text/xml");
-                            usable = parse(doc);
+                            docObject = parse(doc);
 
-                            console.log(usable);
+                            //console.log(docObject);
 
                             // Get the feed title and url
-                            let feedTitle = usable.channel.title ? usable.channel.title : 'No Title';
-                            let feedUrl = usable.channel.link ? usable.channel.link : '#';
+                            let feedTitle = docObject.channel.title ? docObject.channel.title : 'No Title';
+                            let feedUrl = docObject.channel.link ? docObject.channel.link : '#';
                             let h3 = document.createElement("h3");
                             let a = document.createElement("a");
+                            let regex = /((https)|(http)):\/\//gi;
                             a.href = feedUrl;
-                            a.innerHTML = feedUrl;
+                            let feedUrlText = feedUrl ? feedUrl.replace(regex, '') : '';
+                            a.innerHTML = feedUrlText.substring(0, feedUrlText.indexOf('/') != -1 ? feedUrlText.indexOf('/') : feedUrlText.length);
                             h3.innerHTML = feedTitle;
                             h3.prepend(a);
                             document.querySelectorAll(".feed")[findex].prepend(h3);
 
                             // Get the feed image/icon
-                            // let imageUrl = usable.channel.image ? usable.channel.image.url : '';
+                            // let imageUrl = docObject.channel.image ? docObject.channel.image.url : '';
                             // let img = document.createElement("img");
                             // img.setAttribute("src", imageUrl);
                             // document.querySelectorAll(".feed")[findex].prepend(img);
 
-                            let posts = usable.channel.item;
+                            let posts = docObject.channel.item;
                             posts.forEach(function (post, pindex, posts) {
                                 let li = document.createElement("li");
                                 let a = document.createElement("a");
