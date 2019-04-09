@@ -1,2 +1,2 @@
 # rssdeck
-a simple rss reader that kinda-sorta looks like tweetdeck
+a simple rss reader that maybe kinda-sorta looks like tweetdeck
