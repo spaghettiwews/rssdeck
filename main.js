@@ -19,7 +19,7 @@
                             doc = parser.parseFromString(data, "text/xml");
                             docObject = parse(doc);
 
-                            //console.log(docObject);
+                            console.log(docObject);
 
                             // Get the feed title and url
                             let feedTitle = docObject.channel.title ? docObject.channel.title : 'No Title';
