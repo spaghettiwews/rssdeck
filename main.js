@@ -13,58 +13,16 @@ document.addEventListener("DOMContentLoaded", function () {
                     createColumns(feeds.length);
 
                     // Cycle through the feeds and populate the columns with the RSS content from each one
-                    feeds.forEach(async function (feed, findex, feeds) {
-                        let response = await fetch(`https://be-cors-why-not.herokuapp.com/${feed}`);
-                        let data = await response.text();
-
-                        let parser = new DOMParser();
-                        let doc = parser.parseFromString(data, "text/xml");
-                        let docObject = parse(doc);
-
-                        console.log(doc);
-                        console.log(docObject);
-
-                        // Get the feed title and url
-                        let feedTitle = docObject.channel.title ? docObject.channel.title : 'No Title';
-                        let feedUrl = docObject.channel.link ? docObject.channel.link : '#';
-                        let h3 = document.createElement("h3");
-                        let a = document.createElement("a");
-                        let regex = /((https)|(http)):\/\//gi;
-                        a.href = feedUrl;
-                        let feedUrlText = feedUrl ? feedUrl.replace(regex, '') : '';
-                        a.innerHTML = feedUrlText.substring(0, feedUrlText.indexOf('/') != -1 ? feedUrlText.indexOf('/') : feedUrlText.length);
-                        h3.innerHTML = feedTitle;
-                        h3.prepend(a);
-                        document.querySelectorAll(".feed")[findex].prepend(h3);
-
-                        // Get the feed image/icon
-                        // let imageUrl = docObject.channel.image ? docObject.channel.image.url : '';
-                        // let img = document.createElement("img");
-                        // img.setAttribute("src", imageUrl);
-                        // document.querySelectorAll(".feed")[findex].prepend(img);
-
-                        let posts = docObject.channel.item;
-                        posts.forEach(function (post, pindex, posts) {
-                            let li = document.createElement("li");
-                            let a = document.createElement("a");
-                            let time = document.createElement("time");
-                            a.innerHTML = post.title;
-                            a.href = post.link;
-                            a.target = "_blank";
-                            li.appendChild(a);
-                            li.appendChild(time);
-                            document.querySelectorAll(".feed")[findex].querySelector("ol").appendChild(li);
-                        });
+                    feeds.forEach(function (feed, findex, feeds) {
+                        renderFeed(feed, findex);
                     });
-
-
                 }
 
             } else {
 
                 //If no key named rssdeck.feeds in localstorage, then create one and instantiate it with an empty array (serialised)
                 let feeds = [];
-                localStorage.setItem("rssdeck.feeds", JSON.stringify(feeds));
+                saveToLocal("rssdeck.feeds", JSON.stringify(feeds));
             }
 
             //Create handler for saving feed urls to localstorage
@@ -73,10 +31,15 @@ document.addEventListener("DOMContentLoaded", function () {
                 event.preventDefault();
                 if (!feeds.includes(this.querySelector("input").value)) {
                     feeds.push(this.querySelector("input").value);
+
+                    if (saveToLocal("rssdeck.feeds", JSON.stringify(feeds))) {
+                        createColumns(1);
+                    }
+                    let lastFeedIndex = document.querySelectorAll(".feed").length - 1;
+                    renderFeed(this.querySelector("input").value, lastFeedIndex);
                 }
 
-                localStorage.setItem("rssdeck.feeds", JSON.stringify(feeds));
-                //console.log(feeds);
+                this.reset();
             });
 
         }
@@ -96,6 +59,60 @@ let createColumns = function (count) {
         column.appendChild(ol);
         container.appendChild(column);
     }
+}
+
+let saveToLocal = function (key, value) {
+    try {
+        localStorage.setItem(key, value);
+        return true;
+    }
+    catch(error) {
+        return false;
+    }
+}
+
+let renderFeed = async function(feed, findex) {
+    let response = await fetch(`https://be-cors-why-not.herokuapp.com/${feed}`);
+    let data = await response.text();
+
+    let parser = new DOMParser();
+    let doc = parser.parseFromString(data, "text/xml");
+    let docObject = parse(doc);
+
+    console.log(doc);
+    console.log(docObject);
+
+    // Get the feed title and url
+    let feedTitle = docObject.channel.title ? docObject.channel.title : 'No Title';
+    let feedUrl = docObject.channel.link ? docObject.channel.link : '#';
+    let h3 = document.createElement("h3");
+    let a = document.createElement("a");
+    let regex = /((https)|(http)):\/\//gi;
+    a.href = feedUrl;
+    let feedUrlText = feedUrl ? feedUrl.replace(regex, '') : '';
+    a.innerHTML = feedUrlText.substring(0, feedUrlText.indexOf('/') != -1 ? feedUrlText.indexOf('/') : feedUrlText.length);
+    h3.innerHTML = feedTitle;
+    h3.prepend(a);
+    document.querySelectorAll(".feed")[findex].prepend(h3);
+
+    // Get the feed image/icon
+    // let imageUrl = docObject.channel.image ? docObject.channel.image.url : '';
+    // let img = document.createElement("img");
+    // img.setAttribute("src", imageUrl);
+    // document.querySelectorAll(".feed")[findex].prepend(img);
+
+    let posts = docObject.channel.item;
+    posts.forEach(function (post, pindex, posts) {
+        let li = document.createElement("li");
+        let a = document.createElement("a");
+        let time = document.createElement("time");
+        a.innerHTML = post.title;
+        a.href = post.link;
+        a.target = "_blank";
+        li.appendChild(a);
+        li.appendChild(time);
+        document.querySelectorAll(".feed")[findex].querySelector("ol").appendChild(li);
+    });
 }
 
 // flattens an object (recursively!), similarly to Array#flatten
