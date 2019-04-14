@@ -48,7 +48,7 @@ document.addEventListener("DOMContentLoaded", function () {
         console.error(err);
     }
 
-    document.querySelector("#reader>span.close").addEventListener("click", function(){
+    document.querySelector("#reader>span.close").addEventListener("click", function () {
         document.querySelector("body").classList.remove("showReader");
         this.parentElement.querySelector("iframe").remove();
         let iframe = document.createElement("iframe");
@@ -73,12 +73,12 @@ let saveToLocal = function (key, value) {
         localStorage.setItem(key, value);
         return true;
     }
-    catch(error) {
+    catch (error) {
         return false;
     }
 }
 
-let renderFeed = async function(feed, findex) {
+let renderFeed = async function (feed, findex) {
     let response = await fetch(`https://be-cors-why-not.herokuapp.com/${feed}`);
     let data = await response.text();
 
@@ -87,11 +87,11 @@ let renderFeed = async function(feed, findex) {
     let docObject = parse(doc);
 
     // console.log(doc);
-    // console.log(docObject);
+    console.log(docObject);
 
     // Get the feed title and url
-    let feedTitle = docObject.channel.title ? docObject.channel.title : 'No Title';
-    let feedUrl = docObject.channel.link ? docObject.channel.link : '#';
+    let feedTitle = docObject.channel ? (docObject.channel.title ? docObject.channel.title : 'No Title') : (docObject.title ? docObject.title : 'No Title');
+    let feedUrl = docObject.channel ? (docObject.channel.link ? docObject.channel.link : '#') : (docObject.id ? docObject.id : '#');
     let h3 = document.createElement("h3");
     let a = document.createElement("a");
     let regex = /((https)|(http)):\/\//gi;
@@ -108,21 +108,21 @@ let renderFeed = async function(feed, findex) {
     // img.setAttribute("src", imageUrl);
     // document.querySelectorAll(".feed")[findex].prepend(img);
 
-    let posts = docObject.channel.item;
+    let posts = docObject.channel ? docObject.channel.item : docObject.entry;
     posts.forEach(function (post, pindex, posts) {
         let li = document.createElement("li");
         let a = document.createElement("a");
         let time = document.createElement("time");
         a.innerHTML = post.title;
-        a.href = post.link;
+        a.href = docObject.channel ? post.link : post.id;
         a.target = "_blank";
         li.appendChild(a);
         li.appendChild(time);
         document.querySelectorAll(".feed")[findex].querySelector("ol").appendChild(li);
     });
 
-    document.querySelectorAll(".feed a").forEach(function(link, lindex, links) {
-        link.addEventListener("click", function(event){
+    document.querySelectorAll(".feed a").forEach(function (link, lindex, links) {
+        link.addEventListener("click", function (event) {
             event.preventDefault();
             document.querySelector("body").classList.add("showReader");
             loadPost(link.getAttribute("href"));
@@ -130,11 +130,11 @@ let renderFeed = async function(feed, findex) {
     });
 }
 
-let loadPost = async function(url) {
+let loadPost = async function (url) {
     let post = await fetch(`https://be-cors-why-not.herokuapp.com/${url}`);
     let postText = await post.text();
     // console.log(postText);
-    let iframe = document.querySelector("iframe").contentWindow; 
+    let iframe = document.querySelector("iframe").contentWindow;
     iframe.document.getElementsByTagName("html")[0].innerHTML = postText;
 }
 
