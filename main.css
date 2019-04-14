@@ -23,14 +23,14 @@
         display: block;
         margin: 0;
     }
-    
+
     h1#logo {
         float: left;
         font-size: 0;
         padding: 15px 0;
     }
 
-    h1#logo svg > path:nth-of-type(n+8) {
+    h1#logo svg>path:nth-of-type(n+8) {
         fill: red !important;
     }
 
@@ -116,4 +116,52 @@
         float: right;
         line-height: 1;
         padding: 15px 0 15px 15px;
+    }
+
+    time {
+        font-size: 11px;
+        display: block;
+        text-transform: uppercase;
+        color: #000;
+        font-family: monospace;
+    }
+
+    body:not(.showReader) div#reader {
+        display: none;
+    }
+
+    body.showReader {
+        overflow: hidden;
+    }
+
+    div#reader {
+        position: fixed;
+        background: #ffffff url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAoAAAAKCAYAAACNMs+9AAAAEUlEQVQYlWNgIA74jiqisyIAZc8DA44KTHYAAAAASUVORK5CYII=);
+        padding: 3rem;
+        top: 0;
+        left: 0;
+        height: 100vh;
+        width: 100vw;
+    }
+
+    #reader>span.close {
+        position: absolute;
+        top: 0;
+        right: 0;
+        width: 3rem;
+        height: 3rem;
+        padding: 1rem;
+        background: #1c1259;
+        cursor: pointer;
+    }
+
+    span.close svg * {
+        fill: #fff;
+    }
+
+    iframe {
+        height: 100%;
+        width: 100%;
+        background: #fff;
+        border: 1rem solid #1c1259;
     }

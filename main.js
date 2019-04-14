@@ -47,6 +47,13 @@ document.addEventListener("DOMContentLoaded", function () {
     } catch (err) {
         console.error(err);
     }
+
+    document.querySelector("#reader>span.close").addEventListener("click", function(){
+        document.querySelector("body").classList.remove("showReader");
+        this.parentElement.querySelector("iframe").remove();
+        let iframe = document.createElement("iframe");
+        this.parentElement.appendChild(iframe);
+    });
 });
 
 let createColumns = function (count) {
@@ -79,8 +86,8 @@ let renderFeed = async function(feed, findex) {
     let doc = parser.parseFromString(data, "text/xml");
     let docObject = parse(doc);
 
-    console.log(doc);
-    console.log(docObject);
+    // console.log(doc);
+    // console.log(docObject);
 
     // Get the feed title and url
     let feedTitle = docObject.channel.title ? docObject.channel.title : 'No Title';
@@ -113,6 +120,22 @@ let renderFeed = async function(feed, findex) {
         li.appendChild(time);
         document.querySelectorAll(".feed")[findex].querySelector("ol").appendChild(li);
     });
+
+    document.querySelectorAll(".feed a").forEach(function(link, lindex, links) {
+        link.addEventListener("click", function(event){
+            event.preventDefault();
+            document.querySelector("body").classList.add("showReader");
+            loadPost(link.getAttribute("href"));
+        });
+    });
+}
+
+let loadPost = async function(url) {
+    let post = await fetch(`https://be-cors-why-not.herokuapp.com/${url}`);
+    let postText = await post.text();
+    // console.log(postText);
+    let iframe = document.querySelector("iframe").contentWindow; 
+    iframe.document.getElementsByTagName("html")[0].innerHTML = postText;
 }
 
 // flattens an object (recursively!), similarly to Array#flatten
