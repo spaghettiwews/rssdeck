@@ -176,6 +176,8 @@ const renderFeed = async function (feed, findex) {
         a.innerHTML = post.title;
         a.href = docObject.channel ? post.link : post.id;
         a.target = "_blank";
+        time.innerHTML = timeSpan(docObject.channel ? post.pubDate : post.published);
+        time.setAttribute("datetime", new Date(docObject.channel ? post.pubDate : post.published).toISOString());
         li.appendChild(a);
         li.appendChild(time);
         document.querySelectorAll(".feed")[findex].querySelector("ol").appendChild(li);
@@ -196,6 +198,16 @@ const loadPost = async function (url) {
     // console.log(postText);
     let iframe = document.querySelector("iframe").contentWindow;
     iframe.document.getElementsByTagName("html")[0].innerHTML = postText;
+}
+
+const timeSpan = function (dateText) {
+    let today = new Date();
+    let pubDate = new Date(dateText);
+    let span = today.getTime() - pubDate.getTime();
+    let days = Math.floor(span / (1000 * 60 * 60 * 24));
+    
+    let humanFriendlySpan = (days === 0) ? 'Today' : ((days === 1) ? 'Yesterday' : `${days} days ago`);
+    return humanFriendlySpan;
 }
 
 // flattens an object (recursively!), similarly to Array#flatten
