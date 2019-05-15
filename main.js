@@ -85,6 +85,7 @@ document.addEventListener("DOMContentLoaded", function () {
 });
 
 window.addEventListener("load", function() {
+    document.getElementById("header").removeAttribute("style");
     document.getElementById("reader").removeAttribute("style");
 });
 
