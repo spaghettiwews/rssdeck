@@ -37,6 +37,12 @@
     form {
         float: right;
         padding: 10px 0;
+        overflow: hidden;
+    }
+
+    form .controls {
+        transform: translateX(110%);
+        transition: transform 0.6s cubic-bezier(1, 0, 0, 1);
     }
 
     .container {
@@ -57,10 +63,10 @@
         line-height: 1;
     }
 
-    .controls {
+    /* .controls {
         padding: 1rem 0.5rem;
         background: #000000;
-    }
+    } */
 
     .feed {
         min-width: 300px;
@@ -100,16 +106,80 @@
         padding: 0 0.8rem;
         height: 35px;
         line-height: 35px;
-        border: 2px solid #eee;
-        border-radius: 35px;
+        border: 1px solid #d1d5da;
+        border-right: none;
+        border-radius: 2px 0 0 2px;
+        box-shadow: inset 1px 1px 2px #bcbaba29;
     }
 
-    button {
-        width: 32px;
-        height: 32px;
-        border-radius: 50%;
+    .feed-control, .tag-control {
+        float: left;
+    }
+
+    .tag-control {
+        display: flex;
+        height: 35px;
+        min-width: 300px;
+        line-height: 35px;
+        padding: 0 10px;
+        border: 1px solid #d1d5da;
+        border-right: none;
+        box-shadow: inset 1px 1px 2px #bcbaba29;
+    }
+    ul.tag-list {
+        padding: 0;
+        margin: 0;
+        list-style: none;
+    }
+    .tag-list > li {
+        display: inline-flex;
+        padding: 3px 9px;
+        background: #dee2e8;
+        line-height: 1;
+        margin-right: 6px;
+        border-radius: 3px;
+        font-size: 12px;
+        font-family: monospace;
+        color: #090606;
+        vertical-align: top;
+        margin-top: 7px;
+    }
+    .tag-control input {
+        padding: 0;
         border: none;
+        font: 0.8rem/2.4rem monospace;
+        box-shadow: inset 0px 1px 0px #bcbaba29, inset 0 -1px 0px #bcbaba29;
+    }
+
+    .showForm form .controls {
+        transform: translateX(0%);
+    }
+
+    .showForm button#new {
+        border-top-left-radius: 0;
+        border-bottom-left-radius: 0;
+        background: #fffc00;
+        color: #000;
         font-size: 0;
+    }
+
+    .showForm button#new::before {
+        content: "Save Feed";
+        font-size: 13px;
+    } 
+
+    button#new {
+        height: 35px;
+        width: 130px;
+        margin: 10px 0 10px 0 !important;
+        float: right;
+        font-family: work sans;
+        font-weight: bold;
+        border: 1px solid #d1d5da;
+        border-radius: 2px;
+        padding: 0 15px;
+        box-shadow: 1px 1px 2px #bcbaba52;
+        cursor: pointer;
     }
 
     .github {
@@ -121,7 +191,6 @@
     time {
         font-size: 11px;
         display: block;
-        text-transform: uppercase;
         color: #000;
         font-family: monospace;
     }

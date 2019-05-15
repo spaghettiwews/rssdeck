@@ -27,19 +27,8 @@ document.addEventListener("DOMContentLoaded", function () {
 
             //Create handler for saving feed urls to localstorage
             document.querySelector("form").addEventListener("submit", function (event) {
-                let feeds = JSON.parse(localStorage.getItem("rssdeck.feeds"));
                 event.preventDefault();
-                if (!feeds.includes(this.querySelector("input").value)) {
-                    feeds.push(this.querySelector("input").value);
-
-                    if (saveToLocal("rssdeck.feeds", JSON.stringify(feeds))) {
-                        createColumns(1);
-                    }
-                    let lastFeedIndex = document.querySelectorAll(".feed").length - 1;
-                    renderFeed(this.querySelector("input").value, lastFeedIndex);
-                }
-
-                this.reset();
+                saveForm(this);
             });
 
         }
@@ -54,9 +43,78 @@ document.addEventListener("DOMContentLoaded", function () {
         let iframe = document.createElement("iframe");
         this.parentElement.appendChild(iframe);
     });
+
+    // Create handler for "Add RSS Feed button"
+    document.getElementById("new").addEventListener("click", function () {
+        // if the form is already open/visible submit it else show the form
+        if (document.getElementsByTagName("body")[0].classList.contains("showForm")) {
+            let form = document.getElementsByTagName("form")[0];
+            saveForm(form);
+        }
+        else {
+            document.getElementsByTagName("body")[0].classList.toggle("showForm");
+        }
+    });
+
+
+    // Create handler for adding tags
+    let tagcontrols = document.querySelectorAll(".tag-control");
+    tagcontrols.forEach(function (tc) {
+        tc.addEventListener("click", function () {
+            this.querySelector("input").focus();
+        });
+
+        window.tagsArray = [];
+        
+        ["keyup", "blur"].forEach(function (ev){
+            tc.querySelector("input").addEventListener(ev, function (event) {
+                //console.log(tagsArray);
+                if (( event.key == ' ' || event.key == 'Enter' || event.type == 'blur') && this.value.trim() != '' ) {
+                    let li = document.createElement("li");
+                    let tags = document.querySelector("input[name='tags']");
+                    li.innerHTML = this.value.trim();
+                    tagsArray.push(this.value.trim())
+                    tags.value = JSON.stringify(window.tagsArray);
+                    tc.querySelector("ul").appendChild(li);
+                    this.value = '';
+                }
+    
+            });
+        });
+    });
 });
 
-let createColumns = function (count) {
+window.addEventListener("load", function() {
+    document.getElementById("reader").removeAttribute("style");
+});
+
+const saveForm = function (form) {
+    let feeds = JSON.parse(localStorage.getItem("rssdeck.feeds"));
+    let feed = {};
+    let url = form.querySelector("input[name='url']").value;
+    let tags = JSON.parse(form.querySelector("input[name='tags']").value);
+    if (!feeds.some(f => f.url === url)) {
+        
+        feed.url = url;
+        feed.tags = tags;
+        
+        feeds.push(feed);
+
+        if (saveToLocal("rssdeck.feeds", JSON.stringify(feeds))) {
+            createColumns(1);
+            form.reset();
+            form.querySelector(".tag-list").innerHTML = "";
+            form.querySelector("input[name='tags']").value = "";
+            document.querySelector("body").classList.remove("showForm");
+        }
+        let lastFeedIndex = document.querySelectorAll(".feed").length - 1;
+        renderFeed(feed, lastFeedIndex);
+    }
+    
+    window.tagsArray = [];
+}
+
+const createColumns = function (count) {
     let container = document.querySelector(".container");
     container.classList.remove("nothing");
     for (let i = 0; i < count; i++) {
@@ -68,7 +126,7 @@ let createColumns = function (count) {
     }
 }
 
-let saveToLocal = function (key, value) {
+const saveToLocal = function (key, value) {
     try {
         localStorage.setItem(key, value);
         return true;
@@ -78,8 +136,8 @@ let saveToLocal = function (key, value) {
     }
 }
 
-let renderFeed = async function (feed, findex) {
-    let response = await fetch(`https://be-cors-why-not.herokuapp.com/${feed}`);
+const renderFeed = async function (feed, findex) {
+    let response = await fetch(`https://be-cors-why-not.herokuapp.com/${feed.url}`);
     let data = await response.text();
 
     let parser = new DOMParser();
@@ -87,7 +145,7 @@ let renderFeed = async function (feed, findex) {
     let docObject = parse(doc);
 
     // console.log(doc);
-    console.log(docObject);
+    // console.log(docObject);
 
     // Get the feed title and url
     let feedTitle = docObject.channel ? (docObject.channel.title ? docObject.channel.title : 'No Title') : (docObject.title ? docObject.title : 'No Title');
@@ -100,6 +158,8 @@ let renderFeed = async function (feed, findex) {
     a.innerHTML = feedUrlText.substring(0, feedUrlText.indexOf('/') != -1 ? feedUrlText.indexOf('/') : feedUrlText.length);
     h3.innerHTML = feedTitle;
     h3.prepend(a);
+
+    document.querySelectorAll(".feed")[findex].classList += ` ${feed.tags.join(' ')}`;//` ${feed.tags.replace(/,/gi, '')}`;
     document.querySelectorAll(".feed")[findex].prepend(h3);
 
     // Get the feed image/icon
@@ -130,7 +190,7 @@ let renderFeed = async function (feed, findex) {
     });
 }
 
-let loadPost = async function (url) {
+const loadPost = async function (url) {
     let post = await fetch(`https://be-cors-why-not.herokuapp.com/${url}`);
     let postText = await post.text();
     // console.log(postText);
@@ -140,12 +200,12 @@ let loadPost = async function (url) {
 
 // flattens an object (recursively!), similarly to Array#flatten
 // e.g. flatten({ a: { b: { c: "hello!" } } }); // => "hello!"
-function flatten(object) {
+const flatten = function (object) {
     var check = _.isPlainObject(object) && _.size(object) === 1;
     return check ? flatten(_.values(object)[0]) : object;
 }
 
-function parse(xml) {
+const parse = function (xml) {
     var data = {};
 
     var isText = xml.nodeType === 3,

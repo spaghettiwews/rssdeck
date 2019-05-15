@@ -65,13 +65,32 @@
                     d="M152.61,107.44a16.29,16.29,0,0,0-5.15,31.75,0.82,0.82,0,0,0,1.11-.79c0-.39,0-1.41,0-2.77-4.53,1-5.49-2.18-5.49-2.18a4.31,4.31,0,0,0-1.81-2.38c-1.48-1,.11-1,0.11-1a3.42,3.42,0,0,1,2.5,1.68,3.47,3.47,0,0,0,4.74,1.35,3.48,3.48,0,0,1,1-2.18c-3.62-.41-7.42-1.81-7.42-8.05a6.3,6.3,0,0,1,1.68-4.37,5.86,5.86,0,0,1,.16-4.31s1.37-.44,4.48,1.67a15.44,15.44,0,0,1,8.16,0c3.11-2.11,4.48-1.67,4.48-1.67a5.85,5.85,0,0,1,.16,4.31,6.29,6.29,0,0,1,1.67,4.37c0,6.26-3.81,7.63-7.44,8a3.89,3.89,0,0,1,1.11,3c0,2.18,0,3.93,0,4.47a0.82,0.82,0,0,0,1.12.78A16.29,16.29,0,0,0,152.61,107.44Z"
                     transform="translate(-136.32 -107.44)" style="fill:#191717;fill-rule:evenodd" />
             </svg></a>
+        <button id="new">Add RSS Feed</button>
         <form method="post" action="">
-            <input type="url" placeholder="https://example.org/feed">
+            <div class="controls">
+                <div class="feed-control">
+                    <input name="url" type="url" placeholder="https://example.org/feed/rss.xml" required="true">
+                </div>
+                <div class="tag-control">
+                    <ul class="tag-list">
+                    </ul>
+                    <input name="tag" type="text" value="" list="all-tags">
+                    <input name="tags" type="hidden" value="" required="true">
+                    <datalist id="all-tags">
+                        <option value="technology">
+                        <option value="science">
+                        <option value="news">
+                        <option value="local">
+                        <option value="personal">
+                        <option value="blog">
+                    </datalist>
+                </div>
+            </div>
         </form>
     </header>
     <div class="container nothing">
     </div>
-    <div id="reader"><span class="close"><svg width="16px" height="16px" xmlns="http://www.w3.org/2000/svg"
+    <div id="reader" style="display: none;"><span class="close"><svg width="16px" height="16px" xmlns="http://www.w3.org/2000/svg"
                 viewBox="0 0 14 14">
                 <title>close-icon</title>
                 <path
